@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+includes:
+
+  gatto-image:
+    taskfile: ./Taskfile-jvm.yml
+    dir: ./gatto-image
+    aliases:
+      - image
+    vars:
+      ARTIFACT_NAME: gatto-image
+      VERSION: '1.0'
+      XMX: '8g'
+
+  gatto-guidance:
+    taskfile: ./Taskfile-jvm.yml
+    dir: ./gatto-guidance
+    aliases:
+      - guidance
+    vars:
+      ARTIFACT_NAME: gatto-guidance
+      VERSION: '1.0'
+
+tasks:
+
+  run-guidance-perf-test:
+    desc: 'Run simple load-test of `gatto-guidance service` with `vegeta`'
+    cmd:
+      task: run-perf-test
+      vars:
+        ENDPOINT: 'http://localhost:8081/gatto-guidance/ask'
+
+  run-image-perf-test:
+    desc: 'Run simple load-test of `gatto-image service` with `vegeta`'
+    cmd:
+      task: run-perf-test
+      vars:
+        ENDPOINT: 'http://localhost:8080/gatto-image/guidance'
+
+  run-perf-test:
+    internal: true
+    vars:
+      RATE: '{{.RATE | default 75}}'
+      DURATION: '{{.DURATION | default "10s"}}'
+    cmd: |
+      echo 'GET {{.ENDPOINT}}' | vegeta attack -rate={{.RATE}} -duration={{.DURATION}} | vegeta report

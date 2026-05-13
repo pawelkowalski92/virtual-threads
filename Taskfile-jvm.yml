@@ -1,0 +1,41 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+vars:
+  XMX: '{{.XMX | default "4G"}}'
+  JAR_EXEC: '{{.TASK_DIR}}/build/libs/{{.ARTIFACT_NAME}}-{{.VERSION}}.jar'
+
+tasks:
+
+  build:
+    desc: 'Build {{.ARTIFACT_NAME}} service'
+    cmd: |
+      {{.TASK_DIR}}/gradlew :clean :build --project-dir={{.TASK_DIR}}
+    sources:
+      - '{{.TASK_DIR}}/src/main/**'
+      - '{{.TASK_DIR}}/src/test/**'
+    generates:
+      - '{{.TASK_DIR}}/build/classes/**'
+      - '{{.TASK_DIR}}/build/resources/**'
+
+  run:
+    desc: 'Start {{.ARTIFACT_NAME}} service'
+    deps:
+      - build
+    cmd: |
+      java -jar -Xmx{{.XMX}} {{.JAR_EXEC}} {{.CLI_ARGS}}
+
+  run-with-jfr:
+    desc: 'Start {{.ARTIFACT_NAME}} service with JFR recording'
+    deps:
+      - build
+    vars:
+      RECORDING_NAME: '{{.RECORDING_NAME | default "recording"}}'
+    cmd: |
+      mkdir -p {{.TASK_DIR}}/recording
+      java -jar \
+      -Xmx{{.XMX}} \
+      -XX:NativeMemoryTracking=detail \
+      -XX:StartFlightRecording:filename={{.TASK_DIR}}/recording/{{.RECORDING_NAME}}.jfr,settings=profile.jfc,dumponexit=true \
+      {{.JAR_EXEC}} {{.CLI_ARGS}}
