@@ -1,0 +1,19 @@
+gatto-meowelho:
+  guidance:
+    base-url: "http://localhost:8081"
+  renderer:
+    signature: "Gatto Meow'ehlo"
+    use-cpu-pool: ${IMG_CPU_POOL:false}
+
+
+server:
+  port: 8080
+  tomcat:
+    threads:
+      max: ${IMG_MAX_THREADS:200}
+      min-spare: 10
+
+spring:
+  threads:
+    virtual:
+      enabled: ${IMG_ENABLE_VIRTUAL:false}
