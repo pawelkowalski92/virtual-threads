@@ -1,0 +1,26 @@
+gatto-meowelho:
+  log-communication: true
+  personified-response-percent: ${GATTO_PERSONIFIED_RATIO:0}
+  prerecorded-publishing-delay: ${GATTO_PUBLISHING_DELAY:PT5S}
+
+server:
+  port: 8081
+
+spring:
+  threads:
+    virtual:
+      enabled: ${GATTO_ENABLE_VIRTUAL:false}
+  ai:
+    model:
+      chat: google-genai
+    google:
+      genai:
+        api-key: ${GATTO_GEN_AI_KEY}
+        chat:
+          options:
+            model: gemini-3-flash-preview
+            temperature: 1
+            thinking-level: HIGH
+
+logging.level:
+  org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor: DEBUG

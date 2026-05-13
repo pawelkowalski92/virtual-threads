@@ -1,0 +1,1 @@
+Wygeneruj sekwencję w pasującą do nastroju: {mood}.
